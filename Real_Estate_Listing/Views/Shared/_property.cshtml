@@ -1,0 +1,36 @@
+﻿@model Real_Estate_Listing.Models.RealEstateProperty
+<span class="pull-right">
+    @if (!Model.SaleDate.HasValue)
+    {
+        @Ajax.ActionLink("Sell Property", "Sell", new { controller = "RealEstateProperties", id = Model.id }, new AjaxOptions
+   {
+       HttpMethod = "GET",
+       InsertionMode = InsertionMode.Replace,
+       UpdateTargetId = "Content-" + Model.id
+        },
+            new { @class = "btn btn-primary btn-xs" })
+    }
+    <br />
+    <span class="pull-right" style="padding-top: 5px; padding-right: 5px;">
+        @Ajax.ActionLink("Delete", "Delete", new { controller = "RealEstateProperties", id = Model.id }, new AjaxOptions
+   {
+       HttpMethod = "POST",
+       InsertionMode = InsertionMode.ReplaceWith,
+       UpdateTargetId = "Content-" + Model.id,
+       Confirm = "Are you sure you want to delete " + Model.Address + "?",
+   }, new
+   {
+       @class = "btn btn-xs btn-danger"
+   })
+    </span>
+</span>
+<strong>@Model.Address</strong>
+@if (!Model.SaleDate.HasValue)
+{
+    <span class="label label-success">Available</span>
+}
+else
+{
+    <span class="text-muted"> - Sold </span>
+}
+<p class="text-muted">@Model.Category.name</p>

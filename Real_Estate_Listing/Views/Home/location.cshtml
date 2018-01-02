@@ -1,0 +1,45 @@
+﻿<script>
+    $(document).ready(
+        function () {
+            $(document).on('click', '#Locationimg', function () {
+                if (Modernizr.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (location) {
+                        var marker = location.coords.latitude + "," + location.coords.longitude;
+                        var url = "http://maps.googleapis.com/maps/api/staticmap?";
+                        url += "&size=1980x300&key=AIzaSyCS2yNvFPNc5Z1TffSLu4VtDh-NJZYyBeg&maptype=roadmap&sensor=true";
+                        url += "&markers=" + marker;
+                        var html = '<img class="modal-content secondaryModal" src="' + url + '"</img>'
+                        $("#locationmap").empty();
+                        $("#locationmap").append(html);
+                        var htmlText = 'Latitude: ' + location.coords.latitude.toFixed(2) + ' | ' + 'Longitude: ' + location.coords.longitude.toFixed(2);
+                        $('#caption').empty();
+                        $('#caption').append('<hr/><b>' + htmlText + '</b><hr/>');
+                        $('#myModalImage').modal('show');
+                    });
+                }
+            });
+            $(document).on('click', '#Locationimg', function () {
+                if (Modernizr.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (location) {
+                        var marker = location.coords.latitude + "," + location.coords.longitude;
+                        var url = "http://maps.googleapis.com/maps/api/staticmap?";
+                        url += "&size=1980x300&key=AIzaSyCS2yNvFPNc5Z1TffSLu4VtDh-NJZYyBeg&maptype=roadmap&sensor=true";
+                        url += "&markers=" + marker;
+                        var html = '<img class="modal-content secondaryModal" src="' + url + '"</img>'
+                        $("#locationmap").empty();
+                        $("#locationmap").append(html);
+                        var htmlText = 'Latitude: ' + location.coords.latitude.toFixed(2) + ' | ' + 'Longitude: ' + location.coords.longitude.toFixed(2);
+                        $('#caption').empty();
+                        $('#caption').append('<hr/><b>' + htmlText + '</b><hr/>');
+                        $('#myModalImage').modal('show');
+                    });
+                }
+            });
+            $(document).keyup(function (e) {
+                if (e.keyCode === 27) $('#myModalImage').modal('hide');  // esc
+            });
+        });
+</script>
+<div id="locationmap"></div>
+<div id="caption"></div>
+

@@ -1,0 +1,62 @@
+﻿@model Real_Estate_Listing.Models.RealEstateProperty
+<li class="list-group-item">
+    @Html.AntiForgeryToken()
+            <h4>Add new Property</h4>
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="Address" name="Address" type="text" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Latitude, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="Latitude" name="Latitude" type="text" value="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Longitude, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="Longitude" name="Longitude" type="text" value="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OriginalSaleAmount, "Original Sale Amount", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="OriginalSaleAmount" name="OriginalSaleAmount" type="text" value="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SoldAmount, "Sold Amount", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="SoldAmount" name="SoldAmount" type="text" value="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SaleDate, "Sale Date", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="SaleDate" name="SaleDate" type="text" value="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CategoryId, "Name", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownList("CategoryId", null, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+</li>

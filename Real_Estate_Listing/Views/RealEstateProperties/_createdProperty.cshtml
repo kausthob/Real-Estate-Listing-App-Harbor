@@ -1,0 +1,10 @@
+﻿@model Real_Estate_Listing.Models.RealEstateProperty
+
+<li class="list-group-item" id="Content-@Model.id">
+    @{ Html.RenderPartial("_property", Model); }
+</li>
+<li class="list-group-item" id="createFormContent">
+    <div class="text-center">
+        <a class="btn btn-primary">Add new property</a>
+    </div>
+</li>

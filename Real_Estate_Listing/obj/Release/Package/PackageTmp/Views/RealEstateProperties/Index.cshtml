@@ -1,0 +1,86 @@
+﻿@model IEnumerable<Real_Estate_Listing.Models.RealEstateProperty>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Real Estate listing</h2>
+
+<p>
+    @Html.ActionLink("Add Property", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            Category
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Address)
+        </th>
+        <!--<th>
+            @Html.DisplayNameFor(model => model.Latitude)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Longitude)
+        </th>-->
+        <th>
+            Original Sale Amount
+        </th>
+        <th>
+            Sold Amount
+        </th>
+        <th>
+            Sale Date
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model.ToArray().OrderByDescending(x => x.SaleDate))
+{
+    <tr class="@(item.SaleDate.HasValue ? "text-danger" : "text-success")">
+        <td>
+            @if (item.SaleDate.HasValue)
+            {
+                <span class="label label-danger">Sold</span>
+            }
+            else
+            {
+                <span class="label label-success">Available</span>
+            }
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.Category.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Address)
+        </td>
+        <!--<td>
+            @Html.DisplayFor(modelItem => item.Latitude)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Longitude)
+        </td>-->
+        <td>
+            @Html.DisplayFor(modelItem => item.OriginalSaleAmount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SoldAmount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SaleDate)
+        </td>
+        <td>
+            <!--@Html.ActionLink("Edit", "Edit", new { id = item.id }) |-->
+            @Html.ActionLink("Details", "Details", new { id = item.id })
+            <!--@Html.ActionLink("Delete", "Delete", new { id = item.id })-->
+            @if (!item.SaleDate.HasValue)
+            {
+            @Html.ActionLink(" | Sell", "Sell", new { id = item.id })
+            }
+        </td>
+    </tr>
+}
+
+</table>

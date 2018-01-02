@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="DefaultConnection-Web.config Connection String" description="DefaultConnection Connection String used in web.config by the application to access the database." defaultValue="Server=sql1.gtt.me;Database=db_b69cca7d407a4b39b9c426537213b603;User Id=U_b69cca7d407a4b39b9c426537213b603;Password=pwd_b69cca7d407a4b39b9c426537213b603" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\Kausthob\\Desktop\\C\#\ Project\\Real_Estate_Listing_JQuery_Ajax_Responsive\\Real_Estate_Listing\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
+  </parameter>
+</parameters>

@@ -1,0 +1,330 @@
+﻿@{
+    ViewBag.Title = "Responsive Home Page";
+}
+@Styles.Render("~/Content/Real_Estate_Listing.css")
+<script>
+    function lineItem(id, Address, SaleDate, category) {
+        var li = $('<li class="list-group-item cursive" id="Content-' + id + '"></li>');
+        var divContent = '<span><strong>' + Address + '</strong>';
+            if (SaleDate != null) {
+                divContent = divContent + '<span class="text-muted cursive propSold"> - Sold </span>';
+            }
+            else {
+                divContent = divContent + '<span class="label label-success propAvailable" style="margin-left: 5px;">Available</span>';
+            }
+            divContent = divContent + '<span class="pull-right">';
+
+            if (SaleDate == null) {
+                divContent = divContent + '<span id="SellPropbtn" sellprop-id="' + id + '" class="btn btn-primary btn-xs sellpropclass">Sell Property</span><br/>';
+            }
+            divContent = divContent + '<span id="DelPropbtn" delprop-id="'+id+'" class="pull-right btn btn-xs btn-danger" style= "margin-top: 5px; margin-right: 5px;">Delete</span>' +
+            '</span>';
+            divContent = divContent + '<p class="text-muted cursive">' + category + ' | ' + '<a id="EditPropertybtn" editprop-id="' + id +'">Edit</a></p>';
+        divContent = divContent + '</span>';
+        var SellDiv =
+            '<div id = "SellPropDiv-'+id +'" hidden="hidden">' +
+                '<span class="pull-right">'+
+            '<a id="SellPropCancel" SellPropCancel-Id=' + id +' style="margin-left: 5px;">Cancel</a>' +
+                '</span>' +
+                '<div class="form-group">' +
+                    '<label class="control-label cursive">Amount</label>' +
+                    '<div>' +
+                        '<input class="form-control" value="">' +
+                        '<a class="btn btn-primary cursive" style="margin-top: 5px;" id="SellPropConfirm" sellconfirm-id="' + id +'">Sell</a>'+
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        divContent = divContent + SellDiv;
+        li.append(divContent);
+        return li;
+    }
+
+    function refreshIndex() {
+        $.ajax({
+            url: '/Home/LoadProp/',
+            dataType: 'json',
+            contentType: 'application/json',
+            method: 'GET',
+            data: {
+                json: JSON.stringify({})
+            },
+            beforeSend: function () {
+                console.log("Before send");
+                $('#myModal').modal('show')
+            },
+            complete: function () {
+                console.log("Complete");
+                $('#myModal').modal('hide');
+                $('#AddPropDetails').focus();
+            }
+        }).done(function (responseData, status, xhr) {
+            var responseData = responseData;
+            $("#propertyContent").empty();
+            $.each(responseData, function (index, item) {
+                $("#propertyContent").append(lineItem(item.id, item.Address, item.SaleDate, item.Category.name));
+            });
+        }).fail(function (xhr, status, error) {
+            alert("Please refresh the page");
+        });
+    }
+
+    $(document).ready(
+        function () {
+            refreshIndex();
+
+        //Add new Property
+        $("#Addpropertybtn").click(function () {
+            $.ajax({
+                url: "/RealEstateProperties/Create/",
+                dataType: 'html',
+                contentType: 'text/html',
+                method: 'GET'
+            }).done(function (responseHtml, status, xhr) {
+                $('#AddPropDetails').find('input').val('');
+                //handle dynamic creation of Categories Select list
+                responseHtml = JSON.parse(responseHtml);
+                var categoryHtml = '<select class="form-control" id="CategoryId" name="CategoryId">'
+                $.each(responseHtml, function (index, item) {
+                    console.log(item.Value);
+                    categoryHtml = categoryHtml + '<option value="' + item.Value + '">' + item.Text + '</option>';
+                });
+                categoryHtml = categoryHtml + '</select>'
+                //$('#Categorydiv').empty();
+                //$('#Categorydiv').append(categoryHtml);
+                $('#CategoryId').prop('selectedIndex', 0);
+                $("#AddPropDetails").show();
+                $("#CreatenewProp").show();
+                $("#UpdateProp").hide();
+                $('#Address').focus();
+            }).fail(function (xhr, status, error) {
+                alert("Add new property failed, Try again.");
+            });
+        });
+
+        //Create new Property
+        $("#CreatenewProp").click(function () {
+            var requestData = {
+                Address: $("#Address").val(),
+                Latitude: $("#Latitude").val(),
+                Longitude: $("#Longitude").val(),
+                OriginalSaleAmount: $("#OriginalSaleAmount").val(),
+                CategoryId: $("#CategoryId").val()
+            };
+
+            $.ajax({
+                url: '/RealEstateProperties/Create/',
+                dataType: 'json',
+                contentType: 'application/json',
+                method: 'POST',
+                data: JSON.stringify(requestData)
+            }).done(function (responseHtml, status, xhr) {
+                $("#AddPropDetails").hide();
+                refreshIndex();
+                $('#AddPropDetails').find('input').val('');
+                $('#CategoryId').prop('selectedIndex', 0);
+            }).fail(function (xhr, status, error) {
+                alert("Create new property failed, Try again.");
+            });
+        });
+
+        //Delete Property
+        $(document).on('click', '#DelPropbtn', function () {
+
+            var itemId = $(this).attr("delprop-id");
+            var requestData = {
+                id: itemId
+            };
+            var result = confirm('Are you sure you want to delete ' + $(this).parent('span').parent('span').find('strong').html()+'?');
+            if (result == true) {
+                $.ajax({
+                    url: "/RealEstateProperties/DeleteConfirmed/",
+                    dataType: 'html',
+                    method: 'POST',
+                    data: requestData
+                }).done(function (responseHtml, status, xhr) {
+                    $('#AddPropDetails').find('input').val('');
+                    $('#CategoryId').prop('selectedIndex', 0);
+                    refreshIndex();
+                    $("#CreatenewProp").show();
+                    $("#UpdateProp").hide();
+                }).fail(function (xhr, status, error) {
+                    alert("Delete property failed, Try again.");
+                });
+            }
+        });
+
+        //Sell Property
+        $(document).on('click', '#SellPropbtn', function () {
+            var targetId = $(this).attr("sellprop-id");
+            var divid = "#SellPropDiv-" + targetId;
+            $(divid).show();
+        });
+
+        //Cancel sell
+        $(document).on('click', '#SellPropCancel', function () {
+            var targetId = $(this).attr("SellPropCancel-Id");
+            var divid = "#SellPropDiv-" + targetId;
+            $(divid).hide();
+            $(divid).find('input').val('');
+        });
+
+        //Confirm Sell
+        $(document).on('click', '#SellPropConfirm', function () {
+            var targetId = $(this).attr("sellconfirm-id");
+            var requestData = {
+                id: targetId,
+                SoldAmount: $(this).siblings('input').val()
+            };
+            $.ajax({
+                url: '/RealEstateProperties/CustomSell/',
+                dataType: 'html',
+                method: 'POST',
+                data: requestData
+            }).done(function (responseHtml, status, xhr) {
+                refreshIndex();
+            }).fail(function (xhr, status, error) {
+                alert("Sell property failed, Try again.");
+            });
+        });
+
+        //Update property
+            $(document).on('click', '#UpdateProp', function () {
+                var requestData = {
+                    id: $('#EditPropId').val(),
+                    Address: $("#Address").val(),
+                    Latitude: $("#Latitude").val(),
+                    Longitude: $("#Longitude").val(),
+                    OriginalSaleAmount: $("#OriginalSaleAmount").val(),
+                    CategoryId: $("#CategoryId").val()
+                };
+
+                $.ajax({
+                    url: '/RealEstateProperties/CustomEditConfirm/',
+                    dataType: 'html',
+                    method: 'POST',
+                    data: requestData
+                }).done(function (responseHtml, status, xhr) {
+                    $("#AddPropDetails").hide();
+                    refreshIndex();
+                    $('#AddPropDetails').find('input').val('');
+                    $('#CategoryId').prop('selectedIndex', 0);
+                    }).fail(function (xhr, status, error) {
+                        alert("Edit property failed, Try again.");
+                    });
+            });
+
+
+        //Edit
+        $(document).on('click', '#EditPropertybtn', function () {
+            console.log($(this).attr("editprop-id"));
+            var requestData = {
+                id: $(this).attr("editprop-id")
+            };
+            $.ajax({
+                url: "/RealEstateProperties/CustomEdit/",
+                dataType: 'json',
+                contentType: 'application/json',
+                method: 'GET',
+                data: requestData
+            }).done(function (responseHtml, status, xhr) {
+                var item = JSON.parse(JSON.stringify(responseHtml));
+                $("#EditPropId").val(requestData.id);
+                $("#Address").val(item.Address);
+                $("#Latitude").val(item.Latitude);
+                $("#Longitude").val(item.Longitude);
+                $("#OriginalSaleAmount").val(item.OriginalSaleAmount)
+                $("#CategoryId").val(item.CategoryId);
+                $("#AddPropDetails").show();
+                $("#CreatenewProp").hide();
+                $("#UpdateProp").show();
+                $("#Address").focus();
+            }).fail(function (xhr, status, error) {
+                alert("Update property failed, Try again.");
+            });
+        });
+
+    });
+</script>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="vertical-alignment-helper">
+        <div class="modal-dialog vertical-align-center" role="document">
+            <div class="modal-content text-center primaryModal">
+                <div class="modal-body text-center">
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="myModalImage" class="modal">
+    @Html.Partial("location")
+</div>
+<br/>
+<img class="CincyImage" src="@Url.Content("~/content/Cincinnati.jpg")" style="width: 100%;" />
+<div class="row" style="margin-top: 20px;">
+    <div class="col-md-8 col-md-offset-2">
+        <div>
+            <span>
+                <li class="list-group-item" id="createFormContent">
+                    <div class="text-center">
+                        <a id="Addpropertybtn" class="btn btn-primary cursive">Add new property</a>
+                        <img id="Locationimg" src="@Url.Content("~/content/Location.png")" style="width:2em;" title="Show Location"/>
+                        <div id="AddPropDetails" hidden="hidden">
+                            <br />
+                            <div class="form-horizontal">
+                                <input type="hidden" value="" id="EditPropId" />
+                                <div class="form-group">
+                                    <label class="control-label col-md-4 cursive">Address</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control text-box single-line" id="Address" name="Address" type="text" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4 cursive">Latitude</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control text-box single-line" id="Latitude" name="Latitude" type="text" value="">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4 cursive">Longitude</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control text-box single-line" id="Longitude" name="Longitude" type="text" value="">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4 cursive">Original Sale Amount</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control text-box single-line" id="OriginalSaleAmount" name="OriginalSaleAmount" type="text" value="">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-4 cursive">Property Type</label>
+                                    <div class="col-md-8">
+                                        <span id="Categorydiv"></span>
+                                        <select class="form-control cursive" id="CategoryId" name="CategoryId">
+                                            <option value="1">Commercial</option>
+                                            <option value="2">Ranch</option>
+                                            <option value="3">Apartment</option>
+                                            <option value="4">Bungalow</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-offset-2 col-md-8">
+                                        <a id="CreatenewProp" class="btn btn-default cursive">Create</a>
+                                        <a id="UpdateProp" class="btn btn-default cursive">Update</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </span>
+            <span id="propertyContent">
+            </span>
+        </div>
+    </div>
+</div>

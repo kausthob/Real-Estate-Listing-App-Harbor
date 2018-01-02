@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Real_Estate_Listing.Models.RealEstateProperty>
+<ul class="list-group">
+    @if (Model.Any())
+    {
+        foreach (var prop in Model)
+        {
+            <li class="list-group-item" id="Content-@prop.id">
+                @{ Html.RenderPartial("_property", prop); }
+            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item">
+                            <div class="alert alert-info">No properties Available</div>
+                        </li>
+                    }
+    <div id="createFormContent">
+        <li class="list-group-item">
+            <div class="text-center">
+                <a class="btn btn-primary">Add new property</a>
+            </div>
+        </li>
+    </div>
+</ul>
+
+
+
